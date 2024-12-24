@@ -41,10 +41,10 @@ public:
     FdOperator(int fd, const char *path);
     FdOperator(const char *path, int o_flgs = O_RDONLY);
 
-    ~FdOperator();
+    virtual ~FdOperator();
 
-    int write(const void *buf, size_t len);
-    int read(void *buf, size_t len);
+    virtual int write(const void *buf, size_t len);
+    virtual int read(void *buf, size_t len);
 
     void configSerial();
 
@@ -54,7 +54,11 @@ public:
     void epollWatch(int flags, bool isolate = false);
     void inotifyWatch(int flags, bool isolate = false);
 
+    virtual void close();
+
 signals:
+    Signal<>        signalClosed;
+
     // WATCH的事件
     Signal<int>     signalEpollWatch;
     Signal<int>     signalInotifyWatch;

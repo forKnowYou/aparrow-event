@@ -153,10 +153,7 @@ FdOperator::FdOperator(const char *path, int o_flags)
 
 FdOperator::~FdOperator()
 {
-    ::close(m_watchEpollFd);
-    ::close(m_watchInotifyFd);
-    ::close(m_watchInotifyEpollFd);
-    ::close(m_fd);
+    close();
 }
 
 int FdOperator::write(const void *buf, size_t len)
@@ -346,6 +343,16 @@ void FdOperator::inotifyWatch(int flags, bool isolate)
             }
         ))->detach();
     }
+}
+
+void FdOperator::close()
+{
+    ::close(m_watchEpollFd);
+    ::close(m_watchInotifyFd);
+    ::close(m_watchInotifyEpollFd);
+    ::close(m_fd);
+
+    emit signalClosed();
 }
 
 #endif

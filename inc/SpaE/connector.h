@@ -151,6 +151,8 @@ private:
     {
         auto sharedAlive = m_containerAlive;
 
+        std::function<void ()>      func;
+
         auto connectSet = m_connectSet;
         for (auto &item: connectSet) {
             {
@@ -161,7 +163,7 @@ private:
                     continue;
                 }
                 m_sharedConnect = mapIt->first;
-                m_func = std::move(std::bind(mapIt->second, args ...));
+                func = std::move(std::bind(mapIt->second, args ...));
             }
 
             auto &conn = * (Connect *) m_sharedConnect.get();
@@ -185,11 +187,11 @@ private:
             }
 
             if (receiverLoop == m_loop) {
-                m_func();
+                func();
             }
             else {
                 if (conn.receiver) {
-                    m_func = [=, func = std::move(m_func)]
+                    func = [=, func = std::move(func)]
                     {
                         if (! conn.receiverAlive->alive) {
                             return;
@@ -201,13 +203,13 @@ private:
                 switch (conn.mode)
                 {
                 case Connect::Auto: {
-                    receiverLoop->work(std::move(m_func));
+                    receiverLoop->work(std::move(func));
                 } break;
                 case Connect::Sync: {
-                    receiverLoop->workSync(std::move(m_func));
+                    receiverLoop->workSync(std::move(func));
                 } break;
                 default: {
-                    receiverLoop->work(std::move(m_func));
+                    receiverLoop->work(std::move(func));
                 } break;
                 }
             }
@@ -223,6 +225,8 @@ private:
     {
         auto sharedAlive = m_containerAlive;
 
+        std::function<void ()>      func;
+
         auto connectSet = m_connectSet;
         for (auto &item: connectSet) {
             {
@@ -233,7 +237,7 @@ private:
                     continue;
                 }
                 m_sharedConnect = mapIt->first;
-                m_func = std::move(std::bind(mapIt->second, args ...));
+                func = std::move(std::bind(mapIt->second, args ...));
             }
 
             auto &conn = * (Connect *) m_sharedConnect.get();
@@ -257,10 +261,10 @@ private:
             }
 
             if (receiverLoop == m_loop) {
-                m_func();
+                func();
             }
             else {
-                auto w = [=, func = std::move(m_func)]
+                auto w = [=, func = std::move(func)]
                 {
                     if (! conn.receiverAlive->alive) {
                         return;
@@ -286,8 +290,6 @@ private:
     SharedConnectBase   m_sharedConnect;
 
     SpinMutex           m_mutex;
-
-    std::function<void ()>      m_func;
 };
 
 // 计算函数参数个数

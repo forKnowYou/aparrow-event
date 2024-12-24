@@ -233,8 +233,6 @@ private:
 
     std::multimap<Priority, WorkFun>::iterator      m_eventsMapIt;
 
-    WorkFun     m_workFun;
-
     bool        m_terminate = false;
 
     std::thread m_thread;

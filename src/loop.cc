@@ -306,14 +306,20 @@ void Loop::run()
 
     m_deleteSem.wait();
 
+    if (m_thread.joinable()) {
+        m_thread.detach();
+    }
+
     delete this;
 }
 
 void Loop::processData()
 {
+    WorkFun     w;
+
     do {
         // 从队列中弹出事件
-        if (m_highPriWorkTable.pop(m_workFun)) {
+        if (m_highPriWorkTable.pop(w)) {
 
         }
         else {
@@ -326,13 +332,13 @@ void Loop::processData()
                 break;
             }
 
-            m_workFun = std::move(m_eventsMapIt->second);
+            w = std::move(m_eventsMapIt->second);
             m_eventsMap.erase(m_eventsMapIt);
         }
 
         // 执行事件
-        if (m_workFun) {
-            m_workFun();
+        if (w) {
+            w();
         }
     } while(m_runSem.tryWait());
 }
