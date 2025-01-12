@@ -92,10 +92,11 @@ void Loop::workSync(const WorkFun &w, const Priority pri)
 
     Semaphore sem;
 
-    workHelper(w, pri);
     workHelper(
         [&]
         {
+            w();
+
             sem.post();
         }
     , pri);
@@ -118,10 +119,11 @@ void Loop::workSync(WorkFun &&w, const Priority pri)
 
     Semaphore sem;
 
-    workHelper(std::move(w), pri);
     workHelper(
         [&]
         {
+            w();
+
             sem.post();
         }
     , pri);
