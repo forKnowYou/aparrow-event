@@ -134,7 +134,7 @@ private:
     SignalSet       m_signalSet;
 };
 
-void disconnect(const SharedConnect &sc);
+void disconnect(const SharedConnectBase &sc);
 void disconnect(Object *sender, Object *receiver);
 void disconnect(Object *sender, SignalBase *signal, Object *receiver, void *slot);
 void disconnectAsSender(Object *sender, SignalBase *signal = nullptr);

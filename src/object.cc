@@ -24,9 +24,9 @@
 
 using namespace SpaE;
 
-static ConnectId        g_connectId = 1;
+static std::atomic<ConnectId>   g_connectId { 1 };
 
-static ObjectId         g_objectId = 1;
+static std::atomic<ObjectId>    g_objectId { 1 };
 
 void SignalBase::bindContainer(Object *o, Loop *loop)
 {
@@ -327,7 +327,7 @@ void Object::moveToLoop(Loop *loop)
 
 
 
-void SpaE::disconnect(const SharedConnect &sc)
+void SpaE::disconnect(const SharedConnectBase &sc)
 {
     sc->disconnectFun(sc);
 }

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <vector>
+#include <atomic>
 
 // for one-write-one-read operator
 template<typename T>
@@ -37,7 +38,7 @@ public:
     }
 
     void push(const T &t) {
-        if (m_available == m_size) {
+        if (m_available == (m_size - 1)) {
             newItems();
         }
         m_itemWrite->t = t;
@@ -47,7 +48,7 @@ public:
     }
 
     void push(T&& t) {
-        if (m_available == m_size) {
+        if (m_available == (m_size - 1)) {
             newItems();
         }
         m_itemWrite->t = std::move(t);
@@ -86,18 +87,18 @@ protected:
             items.rbegin()->next = &items[0];
         }
         else {
-            m_allocated.rbegin()->rbegin()->next = &items[0];
-            items.rbegin()->next = &m_allocated[0][0];
+            items.rbegin()->next = m_itemWrite->next;
+            m_itemWrite->next = &items[0];
         }
 
-        m_allocated.emplace_back(std::move(items));
-
         m_size += items.size();
+
+        m_allocated.emplace_back(std::move(items));
     }
 
 protected:
-    int m_available = 0;
-    int m_size = 0;
+    std::atomic<int>    m_available { 0 };
+    std::atomic<int>    m_size { 0 };
     Item* m_itemWrite = nullptr;
     Item* m_itemRead = nullptr;
     std::vector<std::vector<Item>> m_allocated;

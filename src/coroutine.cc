@@ -30,7 +30,7 @@
 
 using namespace SpaE;
 
-static uint64_t g_contextId = 1;
+static std::atomic<uint64_t>    g_contextId { 1 };
 
 static std::unordered_map<std::thread::id, Coroutine *>      g_coPoolMap;
 static SpinMutex    g_coPoolMutex;
